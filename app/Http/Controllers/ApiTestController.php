@@ -20,6 +20,7 @@ use App\Locate;
 use App\Pending_Sales;
 use App\Transactions;
 use App\Sales;
+use App\Users_type;
 use DB;
 
 class ApiTestController extends Controller
@@ -657,6 +658,16 @@ class ApiTestController extends Controller
 	public function getMeAsUser()
 	{
 		return Auth::check();
+	}
+
+	//Create UsersType -- 
+	public function createUserType(Request $request)
+	{
+		Users_type::create([
+            'name' => $request->name,
+        ]);
+		return response()->json($request);
+
 	}
 	
 

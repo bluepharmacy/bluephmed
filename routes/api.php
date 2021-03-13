@@ -122,4 +122,44 @@ Route::get('getAllSalesToday', 'ApiTestController@getAllSalesToday');
 Route::get('getMeAsUser', 'ApiTestController@getMeAsUser');
 
 
+// createUserType
+Route::post('createUserType', 'ApiTestController@createUserType');
 
+
+
+
+
+
+
+// Mobile Request Api ::::::::::::::::::::::::::::::::::::::
+
+// getAllUsers
+Route::get('getAllUsers', 'ApiMobileController@getAllUsers');
+
+// getAllNewbies
+Route::get('getAllNewbies', 'ApiMobileController@getAllNewbies');
+
+// loginMyAcc
+Route::post('loginMyAcc', 'ApiMobileController@loginMyAcc');
+
+// regMyAcc
+Route::post('regMyAcc', 'ApiMobileController@regMyAcc');
+
+// removeThisInNewUsers 
+Route::delete('removeThisInNewUsers', 'ApiMobileController@removeThisInNewUsers'); 
+
+// removeThisListInNewUsers
+Route::delete('removeThisListInNewUsers', 'ApiMobileController@removeThisListInNewUsers');
+
+// singleAcceptNewUser
+Route::put('singleAcceptNewUser', 'ApiMobileController@singleAcceptNewUser');
+
+// multiAcceptNewUsers
+Route::put('multiAcceptNewUsers', 'ApiMobileController@multiAcceptNewUsers');
+
+// getAllStocks
+Route::get('getAllStocks', 'ApiMobileController@getAllStocks');
+
+
+// updateStock
+Route::put('updateStock', 'ApiMobileController@updateStock');

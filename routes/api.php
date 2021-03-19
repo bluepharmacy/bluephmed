@@ -163,3 +163,6 @@ Route::get('getAllStocks', 'ApiMobileController@getAllStocks');
 
 // updateStock
 Route::put('updateStock', 'ApiMobileController@updateStock');
+
+// lowStocks
+Route::get('lowStock', 'ApiMobileController@lowStock');

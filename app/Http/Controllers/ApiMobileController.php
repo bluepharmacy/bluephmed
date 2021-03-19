@@ -137,7 +137,6 @@ class ApiMobileController extends Controller
 
 	public function getAllStocks()
 	{
-		{
 		// return Product::all();
 		$prod = DB::table('products')
             ->join('prices', 'products.id', '=', 'prices.product_id')
@@ -162,7 +161,6 @@ class ApiMobileController extends Controller
             	 	)
             ->get();
             return $prod;
-		}
 	}
 
 	public function updateStock(Request $request)
@@ -194,6 +192,37 @@ class ApiMobileController extends Controller
 
 		// return $product;
 	}
+
+	// get all low stock
+	public function lowStock()
+	{
+		// return Product::all();
+		$prod = DB::table('products')
+            ->join('prices', 'products.id', '=', 'prices.product_id')
+            ->join('selling', 'products.id', '=', 'selling.product_id')
+            ->leftjoin('locate', 'products.locate_id', '=', 'locate.id')
+            ->leftjoin('map', 'locate.map_id', '=', 'map.id')
+            ->leftjoin('unit', 'products.unit_id', '=', 'unit.id')
+            ->leftjoin('stocks', 'products.id', '=', 'stocks.product_id')
+            ->select(
+            		 'products.id',
+            		 'products.name',
+            		 'unit.per As per',
+            		 'products.locate_id',
+            		 'map.name As location',
+            		 'map.table',
+            		 'map.table',
+            		 'locate.td',
+            		 'locate.tr',
+            	 	 'prices.unit_price',
+            	 	 'selling.price',
+            	 	 'stocks.available As stocks',
+            	 	)
+            ->where('stocks.available', '<', 3)
+            ->orderBy('products.name')
+            ->get();
+            return $prod;
+	} 
 
 
 

@@ -166,3 +166,9 @@ Route::put('updateStock', 'ApiMobileController@updateStock');
 
 // lowStocks
 Route::get('lowStock', 'ApiMobileController@lowStock');
+
+// getProduct
+Route::post('getProduct', 'ApiMobileController@getProduct');
+
+// getPendingSalesID
+Route::post('getPendingSalesID', 'ApiMobileController@getPendingSalesID');

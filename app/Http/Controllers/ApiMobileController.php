@@ -151,14 +151,15 @@ class ApiMobileController extends Controller
             		 'unit.per As per',
             		 'products.locate_id',
             		 'map.name As location',
-            		 'map.table',
-            		 'map.table',
-            		 'locate.td',
-            		 'locate.tr',
+            		 // 'map.table',
+            		 // 'map.table',
+            		 // 'locate.td',
+            		 // 'locate.tr',
             	 	 'prices.unit_price',
             	 	 'selling.price',
             	 	 'stocks.available As stocks',
             	 	)
+            ->orderBy('products.name')
             ->get();
             return $prod;
 	}
@@ -218,7 +219,40 @@ class ApiMobileController extends Controller
             ->orderBy('products.name')
             ->get();
             return $prod;
-	} 
+	}
+
+     // get selected item using ID
+     public function getProduct(Request $request)
+     {
+        $prod = Product::join('prices', 'products.id', '=', 'prices.product_id')
+                        ->leftjoin('selling', 'products.id', '=', 'selling.product_id')
+                        ->leftjoin('locate', 'products.locate_id', '=', 'locate.id')
+                        ->leftjoin('map', 'locate.map_id', '=', 'map.id')
+                        ->leftjoin('unit', 'products.unit_id', '=', 'unit.id')
+                        ->leftjoin('stocks', 'products.id', '=', 'stocks.product_id')
+                        ->select(
+                                 'products.id',
+                                 'products.name',
+                                 'unit.per As per',
+                                 'map.name As location',
+                                 'prices.unit_price',
+                                 'selling.price',
+                                 'stocks.available As stocks',
+                                 // 'prices.id As price_id',
+                                 // 'selling.id As sell_id',
+                                )
+                        ->where('products.id', '=', $request->id)
+                        ->get();  
+        return $prod;
+
+     } 
+
+     // get selected pendingSalesID
+     public function getPendingSalesID(Request $request)
+     {
+        $pending_sales = Pending_Sales::find($request->id);
+        return $pending_sales;
+     }
 
 
 

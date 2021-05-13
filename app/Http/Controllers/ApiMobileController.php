@@ -256,4 +256,340 @@ class ApiMobileController extends Controller
 
 
 
+     // move data = [stocks,unit_price,price,]
+     public function moveStocksUnitPandSellingP(Request $request)
+     {
+            foreach($request->ids as $key => $value){ 
+                    $products = Product::find($request->ids[$key]); 
+                    $products->unit_price = $request->unit_prices[$key]; 
+                    $products->sell_price = $request->prices[$key]; 
+                    $products->stocks = $request->stocks[$key]; 
+                    $products->save(); 
+            }
+            return "success";
+     }
+
+
+    public function getAllDisplayOnAddStocksView()
+    {
+
+        $data_allStocks = DB::table('products')
+            ->leftjoin('locate', 'products.locate_id', '=', 'locate.id')
+            ->leftjoin('map', 'locate.map_id', '=', 'map.id')
+            ->leftjoin('unit', 'products.unit_id', '=', 'unit.id')
+            ->leftjoin('classification', 'products.classification_id', '=', 'classification.id')
+            ->leftjoin('supplier', 'products.sold_from', '=', 'supplier.id')
+            ->select(
+                     'products.id',
+                     'products.name',
+                     'products.unit_price',
+                     'products.sell_price As price',
+                     'products.stocks',
+                     'products.stocks_alert',
+                     'products.discount',
+                     'products.sold_from As sold_fromID',
+                     'products.classification_id',
+                     'supplier.name As sold_from',
+                     'classification.name As classification_name',
+                     'unit.id As perID',
+                     'unit.per As per',
+                     'products.locate_id',
+                     'map.id As map_id',
+                     'map.name As location',
+                     'map.table',
+                     'map.table',
+                     'locate.td',
+                     'locate.tr',
+                    )
+            ->orderBy('products.name')
+            ->get();
+            
+    
+        $data_unit = DB::table('unit')
+                        ->select(
+                                'unit.id',
+                                'unit.per',
+                                )
+                        ->get();
+
+        $data_supplier = DB::table('supplier')
+                            ->select(
+                                    'supplier.id',
+                                    'supplier.name'
+                                    )
+                            ->get();
+
+        $data_classification = DB::table('classification')
+                                ->select(
+                                        'classification.id',
+                                        'classification.name'
+                                        )
+                                ->get();
+
+        $data_map = DB::table('map')
+                        ->select(
+                                'map.id',
+                                'map.name',
+                                'map.table',
+                                )
+                        ->get();
+
+        
+        $arr_allStocks = array('stocks' => $data_allStocks);
+        $arr_unit = array('unit' => $data_unit);
+        $arr_supplier = array('supplier' => $data_supplier);
+        $arr_classification = array('classification' => $data_classification);
+        $arr_map = array('map' => $data_map);
+
+        return array_merge($arr_allStocks,$arr_unit,$arr_supplier,$arr_classification,$arr_map);
+    }
+
+
+    public function insertNewStocks(Request $request)
+    {
+        // return $request->name;
+        $product = Product::where('name', strtoupper($request->name))->first();
+
+        if($product == null)
+        {
+            $product = new Product();
+            $product->name = strtoupper($request->name);
+            $product->unit_price = $request->unit_price;
+            $product->sell_price = $request->sell_price;
+            $product->unit_id = $request->per_ID;
+            $product->sold_from = $request->sold_from;
+            $product->classification_id = $request->classification_id;
+            $product->stocks = $request->stocks_to_add;
+            $product->stocks_alert = $request->stocks_alert;
+            $product->discount = $request->discount;
+
+            $locate = Locate::where('target',$request->map_id . "|" .$request->tr. "|" .$request->td)->first();
+            $locate_id = "";
+
+            if($locate == null)
+            {
+                $new_locate = new Locate();
+                $new_locate->target = $request->map_id . "|" .$request->tr. "|" .$request->td;
+                $new_locate->map_id = $request->map_id;
+                $new_locate->tr = $request->tr;
+                $new_locate->td = $request->td;
+                $new_locate->save();
+                $locate_id = $new_locate->id;
+            }
+            else
+            {
+                $locate_id = $locate->id;
+            }
+
+            $product->locate_id = $locate_id;
+            $product->save();
+
+
+
+
+            return response()->json([
+                'error' => false,
+                'message' => '<b style="color:green">Successfully Inserted</b>',
+                'product' => $product,
+            ], 200);
+
+        }
+        else
+        {
+            return response()->json([
+                'error' => false,
+                'message' => '<b style="color:red">This Item is Already Exists [Not Saved]</b>',
+                'product' => $product,
+            ], 200);
+        }
+    }
+
+
+
+    public function insertExistsStocks(Request $request)
+    {
+        $product = Product::where('name', strtoupper($request->name))->first();
+
+        if($product == null)
+        {
+            
+            return response()->json([
+                'error' => false,
+                'message' => '<b style="color:red">This Item is NOT EXIST [Not Saved]</b>',
+                'product' => $product,
+            ], 200);
+
+        }
+        else
+        {
+            $product->name = strtoupper($request->name);
+            $product->unit_price = $request->unit_price;
+            $product->sell_price = $request->sell_price;
+            $product->unit_id = $request->per_ID;
+            $product->sold_from = $request->sold_from;
+            $product->classification_id = $request->classification_id;
+            $product->stocks = $product->stocks + $request->stocks_to_add;
+            $product->stocks_alert = $request->stocks_alert;
+            $product->discount = $request->discount;
+
+            $locate = Locate::where('target',$request->map_id . "|" .$request->tr. "|" .$request->td)->first();
+            $locate_id = "";
+
+            if($locate == null)
+            {
+                $new_locate = new Locate();
+                $new_locate->target = $request->map_id . "|" .$request->tr. "|" .$request->td;
+                $new_locate->map_id = $request->map_id;
+                $new_locate->tr = $request->tr;
+                $new_locate->td = $request->td;
+                $new_locate->save();
+                $locate_id = $new_locate->id;
+            }
+            else
+            {
+                $locate_id = $locate->id;
+            }
+
+            $product->locate_id = $locate_id;
+            $product->save();
+            
+            return response()->json([
+                'error' => false,
+                'message' => '<b style="color:green">Stocks Successfully in this Item</b>',
+                'product' => $product,
+            ], 200);
+        }
+    }
+
+
+    public function counterGetAllStocks()
+    {
+         $data = DB::table('products')
+            ->leftjoin('locate', 'products.locate_id', '=', 'locate.id')
+            ->leftjoin('map', 'locate.map_id', '=', 'map.id')
+            ->leftjoin('unit', 'products.unit_id', '=', 'unit.id')
+            ->leftjoin('classification', 'products.classification_id', '=', 'classification.id')
+            ->leftjoin('supplier', 'products.sold_from', '=', 'supplier.id')
+            ->select(
+                     'products.id',
+                     'products.name',
+                     'products.unit_price',
+                     'products.sell_price As price',
+                     'products.stocks',
+                     'products.stocks_alert',
+                     'products.discount',
+                     'products.sold_from As sold_fromID',
+                     'products.classification_id',
+                     'supplier.name As sold_from',
+                     'classification.name As classification_name',
+                     'unit.id As perID',
+                     'unit.per As per',
+                     'products.locate_id',
+                     'map.id As map_id',
+                     'map.name As location',
+                     'map.table',
+                     'map.table',
+                     'locate.td',
+                     'locate.tr',
+                    )
+            ->orderBy('products.name')
+            ->get();
+
+            return $data;
+    }
+
+
+    public function salesToCashier(Request $request)
+  {
+
+    $pending_sales = new Pending_Sales;
+    $pending_sales->staff_id = $request->staff_id;
+    $pending_sales->sales = $request->sales;
+    $pending_sales->save();
+
+    return "<b>Sales #".$pending_sales->id."</b> has been sent to cashier \nPlease present this number to your cashier\n<b>SO#".$pending_sales->id."</b>";
+  }
+
+
+  public function insertSalesAndTransaction(Request $request)
+  {
+    $transactions_search = Transactions::where('pending_sales_id', $request->so_number)->first();
+    if($transactions_search == "")
+    {
+// Transaction
+    $transactions = new Transactions;
+    $transactions->customer_id = $request->customer_id;
+    $transactions->customer_name = $request->customer_name;
+    $transactions->payment = "Cash";
+    $transactions->shipping = "0.00";
+    $transactions->discount_less = "0.00";
+    $transactions->grand_total = $request->grand_total;
+    $transactions->customer_money = $request->money_amount;
+    $transactions->change = $request->change;
+    $transactions->staff_id_counter = $request->counter_id;
+    $transactions->staff_id_cashier = $request->cashier_id;
+    $transactions->pending_sales_id = $request->so_number;
+    ($request->date_time == null) ?   :  $transactions->created_at = $request->date_time; // set created_at date when date_time is not null
+    $transactions->save();
+
+
+// // Sales and Products[Stocks Update]
+    $arr = $request->items;
+    $data = json_decode($arr[0], true);
+
+    foreach($data as $key)
+    {
+      $dc_rate = 0;
+      $discounted = 0;
+      if($request->temp_DiscountVal == "1" || $request->temp_DiscountVal == "2")
+      {
+        $discounted = 1;
+        $dc_rate = ($request->temp_DiscountVal == "1") ? "20" : "32"; 
+      }
+
+      $product = Product::find($key['id']);
+
+      $sales = new Sales;
+      $sales->transaction_id       = $transactions->id;
+      $sales->product_id           = $product->id;
+      $sales->quantity             = $key['temp_Qty'];
+      $sales->discounted           = $discounted;
+      $sales->discount_rate        = $dc_rate;
+      $sales->price_per_unit       = $key['price'];
+      $sales->total_price          = $key['temp_Total'];
+      $sales->original_total_price = $key['temp_OrigTotal'];
+      // $sales->discount_less_note   = $key['discount_less_note'];
+      $sales->save();
+
+      $product->stocks = $product->stocks - $key['temp_Qty'];
+      $product->save();
+
+    }
+
+
+    // remove in pending list
+    $pending_sales = Pending_Sales::find($transactions->pending_sales_id);
+    $pending_sales->delete();
+
+    return response()->json([
+                'error' => false,
+                'message' => "<b>Transactions #" . $transactions->id . "</b><br>Your Change: <b style='font-size:180%'>₱".$request->change."</b>",
+                'timeCreated' => $transactions->created_at,
+                'transactionID' => $transactions->id,
+            ], 200);
+
+  }else{
+
+    return response()->json([
+                'error' => false,
+                'message' => "<b style='color:red'>This S0#".$request->so_number." is Already Done by Cashier #".$transactions_search->staff_id_cashier."</b>",
+                // 'timeCreated' => $transactions_search->created_at,
+            ], 200);
+  }
+
+
+  }
+
+
+
 }

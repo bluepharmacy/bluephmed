@@ -172,3 +172,26 @@ Route::post('getProduct', 'ApiMobileController@getProduct');
 
 // getPendingSalesID
 Route::post('getPendingSalesID', 'ApiMobileController@getPendingSalesID');
+
+// Moving Stocks, Unit Price, and Selling Price
+Route::put('moveStocksUnitPandSellingP','ApiMobileController@moveStocksUnitPandSellingP');
+
+
+// getAllDisplayOnAddStocksView
+Route::get('getAllDisplayOnAddStocksView','ApiMobileController@getAllDisplayOnAddStocksView');
+
+// insertNewStocks
+Route::post('insertNewStocks','ApiMobileController@insertNewStocks');
+
+// insertExistsStocks
+Route::post('insertExistsStocks', 'ApiMobileController@insertExistsStocks');
+
+// counterGetAllStocks
+Route::get('counterGetAllStocks', 'ApiMobileController@counterGetAllStocks');
+
+
+// salesToCashier
+Route::post('salesToCashier','ApiMobileController@salesToCashier');
+
+// insertSalesAndTransaction
+Route::post('insertSalesAndTransaction', 'ApiMobileController@insertSalesAndTransaction');

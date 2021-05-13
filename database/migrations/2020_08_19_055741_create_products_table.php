@@ -16,6 +16,8 @@ class CreateProductsTable extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
+            $table->decimal('unit_price')->default(0);
+            $table->decimal('sell_price')->default(0);
             $table->integer('unit_id'); //id of unit
             $table->integer('sold_from')->nullable(); //id of supplier - -
             $table->integer('classification_id')->nullable(); //id of classification ex: Antigout etc - -

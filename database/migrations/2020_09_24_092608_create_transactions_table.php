@@ -25,7 +25,7 @@ class CreateTransactionsTable extends Migration
             $table->decimal('change');
             $table->integer('staff_id_counter'); //staff id counter  incharge
             $table->integer('staff_id_cashier'); //staff id cashier incharge
-            $table->integer('pending_sales_id'); //from pending_sale id
+            $table->integer('pending_sales_id')->unique();
 
             $table->timestamps();
         });

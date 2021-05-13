@@ -31,12 +31,12 @@ class ApiTestController extends Controller
 	{
 		// return Product::all();
 		$prod = DB::table('products')
-            ->join('prices', 'products.id', '=', 'prices.product_id')
-            ->join('selling', 'products.id', '=', 'selling.product_id')
+            // ->join('prices', 'products.id', '=', 'prices.product_id')
+            // ->join('selling', 'products.id', '=', 'selling.product_id')
             ->leftjoin('locate', 'products.locate_id', '=', 'locate.id')
             ->leftjoin('map', 'locate.map_id', '=', 'map.id')
             ->leftjoin('unit', 'products.unit_id', '=', 'unit.id')
-            ->leftjoin('stocks', 'products.id', '=', 'stocks.product_id')
+            // ->leftjoin('stocks', 'products.id', '=', 'stocks.product_id')
             ->select(
             		 'products.id',
             		 'products.name',
@@ -47,9 +47,12 @@ class ApiTestController extends Controller
             		 'map.table',
             		 'locate.td',
             		 'locate.tr',
-            	 	 'prices.unit_price',
-            	 	 'selling.price',
-            	 	 'stocks.available As stocks',
+            	 	 // 'prices.unit_price',
+            	 	 // 'selling.price',
+            	 	 // 'stocks.available As stocks',
+            	 	 'products.unit_price', //new
+            	 	 'products.sell_price As price', //new
+            	 	 'products.stocks', //new
             	 	)
             ->get();
             return $prod;
